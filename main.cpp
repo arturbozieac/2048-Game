@@ -1,7 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
-
+#include <iomanip>
 
 using namespace std;
 
@@ -20,21 +20,28 @@ pair<int, int> generateUnoccupiedPosition() {
 	return make_pair(line, column);
 }
 // function to initialise a new game
-void newGame() {
-	for (int i = 0; i < 4; i++)  //scaning all the matrix and initialise it with 0
-		for (int j = 0; j < 4; ++j)
-			board[i][j] = 0; 
+
+void addPiece() {
 	pair<int, int> pos = generateUnoccupiedPosition();
 	board[pos.first][pos.second] = 2; //asigns 2 to a empty position on board
 }
 
+void newGame() {
+	for (int i = 0; i < 4; i++)  //scaning all the matrix and initialise it with 0
+		for (int j = 0; j < 4; ++j)
+			board[i][j] = 0; 
+	addPiece();
+	
+}
+
 void printUI() {			//User Interface implementation
+	system("cls");
 	for (int i = 0; i < 4; i++){
 		for (int j = 0; j < 4; ++j)
 			if (board[i][j] == 0) //to not show 0, in cells will be printed a "dots"
-				cout << ".";
+				cout << setw(4) << "."; //setw(4) - set width to 4, for a better view
 			else
-				cout << board[i][j];  //printing cell value
+				cout << setw(4) << board[i][j];  //printing cell value
 	cout << "\n";
 		}
 	cout << "\n \n n : New Game, w : Up, s : Down, d: Right, a: Left, q : Quit" << endl;
@@ -56,17 +63,22 @@ void aplyMove(int direction) {
 		startColumn = 3;
 		columnStep = -1;
 	}
-	int movePossible = 0;
-		for (int i = startLine; i >= 0 && i < 4; i += lineStep)  
+	int movePossible, canAddPiece = 0;
+	do {
+		movePossible = 0;
+		for (int i = startLine; i >= 0 && i < 4; i += lineStep)
 			for (int j = startColumn; j >= 0 && j < 4; j += columnStep) {
 				int nextI = i + dirLine[direction], nextJ = j + dirColumn[direction];
-				if (canDoMove(i, j, nextI, nextJ)) {
+				if (board[i][j] && canDoMove(i, j, nextI, nextJ)) {
 					board[nextI][nextJ] += board[i][j];
 					board[i][j] = 0;
-					movePossible = 1;
+					movePossible = canAddPiece = 1;
 				}
 			}
-
+		printUI();
+	} while (movePossible);
+		if (canAddPiece)
+			addPiece();
 }
 
 
